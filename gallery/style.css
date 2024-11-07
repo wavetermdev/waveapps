@@ -104,3 +104,16 @@
 .nav-button.next {
     right: 20px;
 }
+
+.gallery h2 {
+    font-size: 1.2em;
+    margin-top: 0;
+    color: #666;
+}
+
+.no-images {
+    text-align: center;
+    padding: 2em;
+    color: #666;
+    font-size: 1.2em;
+}

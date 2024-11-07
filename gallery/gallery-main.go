@@ -3,13 +3,12 @@ package main
 import (
 	"context"
 	_ "embed"
+	"flag"
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/spf13/cobra"
 	"github.com/wavetermdev/waveterm/pkg/vdom"
 	"github.com/wavetermdev/waveterm/pkg/vdom/vdomclient"
 )
@@ -21,9 +20,6 @@ var styleCSS []byte
 var galleryPath string
 
 var GalleryClient *vdomclient.Client = vdomclient.MakeClient(vdomclient.ApplicationOpts{
-	Name:         "gallery",
-	Use:          "gallery <path>",
-	Description:  "Display an image gallery for a directory",
 	CloseOnCtrlC: true,
 	GlobalStyles: styleCSS,
 })
@@ -82,10 +78,7 @@ var ImageView = vdomclient.DefineComponent[ImageViewProps](GalleryClient, "Image
 )
 
 var App = vdomclient.DefineComponent(GalleryClient, "App",
-	func(ctx context.Context, props vdomclient.AppProps) any {
-		fmt.Printf("App props: %+v\n", props)
-		galleryPath = props.Args[0]
-		log.Printf("galleryPath: %q\n", galleryPath)
+	func(ctx context.Context, _ any) any {
 		// Get images from the provided path
 		images, err := scanDirectory(galleryPath)
 		if err != nil {
@@ -148,24 +141,31 @@ var App = vdomclient.DefineComponent(GalleryClient, "App",
 			vdom.E("div",
 				vdom.Class("gallery-header"),
 				vdom.E("h1", nil, "Image Gallery"),
+				vdom.E("h2", nil, galleryPath),
 			),
 			vdom.Fragment(
 				// Grid view when no image is selected
 				vdom.If(selectedIndex == -1,
-					vdom.E("div",
-						vdom.Class("image-grid"),
-						vdom.ForEachIdx(images, func(img ImageInfo, i int) any {
-							return vdom.E("div",
-								vdom.Class("image-item"),
-								vdom.P("onClick", func() {
-									setSelectedIndex(i)
-								}),
-								vdom.E("img",
-									vdom.P("src", fmt.Sprintf("vdom:///img/%s", img.Path)),
-									vdom.P("alt", img.Path),
-								),
-							)
-						}),
+					vdom.IfElse(len(images) > 0,
+						vdom.E("div",
+							vdom.Class("image-grid"),
+							vdom.ForEachIdx(images, func(img ImageInfo, i int) any {
+								return vdom.E("div",
+									vdom.Class("image-item"),
+									vdom.P("onClick", func() {
+										setSelectedIndex(i)
+									}),
+									vdom.E("img",
+										vdom.P("src", fmt.Sprintf("vdom:///img/%s", img.Path)),
+										vdom.P("alt", img.Path),
+									),
+								)
+							}),
+						),
+						vdom.E("div",
+							vdom.Class("no-images"),
+							"No Images",
+						),
 					),
 				),
 				// Image view
@@ -181,34 +181,34 @@ func scanDirectory(root string) ([]ImageInfo, error) {
 		".jpg": true, ".jpeg": true, ".png": true,
 		".gif": true, ".webp": true,
 	}
-
-	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
+	entries, err := os.ReadDir(root)
+	if err != nil {
+		return nil, err
+	}
+	for _, entry := range entries {
+		if entry.IsDir() {
+			continue
 		}
-		if info.IsDir() {
-			return nil
-		}
-		ext := strings.ToLower(filepath.Ext(path))
+		ext := strings.ToLower(filepath.Ext(entry.Name()))
 		if validExts[ext] {
-			relPath, err := filepath.Rel(root, path)
-			if err != nil {
-				return err
-			}
-			images = append(images, ImageInfo{Path: relPath})
+			images = append(images, ImageInfo{Path: entry.Name()})
 		}
-		return nil
-	})
-
-	return images, err
+	}
+	return images, nil
 }
 
 func main() {
-	log.Printf("hello\n")
-	// Set up image handlers
+	GalleryClient.RegisterDefaultFlags()
+	flag.Parse()
+	if flag.NArg() != 1 {
+		fmt.Fprintf(os.Stderr, "Usage: gallery [flags] <path>\n")
+		flag.PrintDefaults()
+		os.Exit(1)
+	}
+	galleryPath = flag.Arg(0)
 	GalleryClient.RegisterFilePrefixHandler("/img/", func(path string) (*vdomclient.FileHandlerOption, error) {
 		imgPath := strings.TrimPrefix(path, "/img/")
-		fullPath := filepath.Join(GalleryClient.CommandArgs[0], imgPath)
+		fullPath := filepath.Join(galleryPath, imgPath)
 
 		// Get file info first for both existence check and ETag generation
 		fileInfo, err := os.Stat(fullPath)
@@ -232,6 +232,5 @@ func main() {
 			ETag: etag,
 		}, nil
 	})
-	GalleryClient.Command.Args = cobra.ExactArgs(1)
 	GalleryClient.RunMain()
 }
