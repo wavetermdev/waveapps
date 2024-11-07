@@ -12,8 +12,6 @@ import (
 var styleCSS []byte
 
 var TodoVDomClient *vdomclient.Client = vdomclient.MakeClient(vdomclient.ApplicationOpts{
-	Name:         "todo",
-	Description:  "todo list application",
 	CloseOnCtrlC: true,
 	GlobalStyles: styleCSS,
 })
@@ -69,7 +67,7 @@ var InputField = vdomclient.DefineComponent[InputFieldProps](TodoVDomClient, "In
 	},
 )
 
-var TodoItem = vdomclient.DefineComponent[TodoItemProps](TodoVDomClient, "TodoItem",
+var TodoItem = vdomclient.DefineComponent(TodoVDomClient, "TodoItem",
 	func(ctx context.Context, props TodoItemProps) any {
 		return vdom.E("div",
 			vdom.Class("todo-item"),
@@ -93,7 +91,7 @@ var TodoItem = vdomclient.DefineComponent[TodoItemProps](TodoVDomClient, "TodoIt
 	},
 )
 
-var TodoList = vdomclient.DefineComponent[TodoListProps](TodoVDomClient, "TodoList",
+var TodoList = vdomclient.DefineComponent(TodoVDomClient, "TodoList",
 	func(ctx context.Context, props TodoListProps) any {
 		return vdom.E("div",
 			vdom.Class("todo-list"),
@@ -108,8 +106,8 @@ var TodoList = vdomclient.DefineComponent[TodoListProps](TodoVDomClient, "TodoLi
 	},
 )
 
-var App = vdomclient.DefineComponent[struct{}](TodoVDomClient, "App",
-	func(ctx context.Context, _ struct{}) any {
+var App = vdomclient.DefineComponent(TodoVDomClient, "App",
+	func(ctx context.Context, _ any) any {
 		// State using hooks
 		todos, setTodos := vdom.UseState(ctx, []Todo{
 			{Id: 1, Text: "Learn VDOM", Completed: false},
