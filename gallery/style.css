@@ -1,0 +1,106 @@
+.gallery {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    width: 100%; /* Force full width */
+}
+
+.gallery-header {
+    margin-bottom: 20px;
+}
+
+.gallery-header h1 {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.image-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.image-item {
+    width: 200px; /* Fixed width */
+    height: 200px;
+    aspect-ratio: 1;
+    cursor: pointer;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    background: #f0f0f0;
+}
+
+/* Keep cover for grid thumbnails */
+.image-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.image-item:hover::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.image-view {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.full-image {
+    max-height: 100%;
+    max-width: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+}
+.close-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    color: white;
+    font-size: 24px;
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    border: none;
+}
+
+.close-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.nav-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    color: white;
+    font-size: 24px;
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    border: none;
+}
+
+.nav-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.nav-button.prev {
+    left: 20px;
+}
+
+.nav-button.next {
+    right: 20px;
+}

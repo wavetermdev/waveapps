@@ -1,0 +1,9 @@
+*.log
+bin/
+*.dmg
+*.exe
+.DS_Store
+*~
+*.a
+
+
