@@ -1,8 +1,8 @@
 # VDOM System Guide
 
-Wave Terminal includes a powerful VDOM (Virtual DOM) system that lets developers create rich HTML/React-based UI applications directly from Go code. The system translates Go components and elements into React components that are rendered within Wave Terminal's UI.
+Wave Terminal includes a powerful VDOM (Virtual DOM) system that lets developers create rich HTML/React-based UI applications directly from Go code. The system translates Go components and elements into React components that are rendered within Wave Terminal's UI. It's particularly well-suited for administrative interfaces, monitoring dashboards, data visualization, configuration managers, and form-based applications where you want a graphical interface but don't need complex browser-side interactions.
 
-This guide explains how to use the VDOM system to create interactive applications that run in Wave Terminal. While the patterns will feel familiar to React developers (components, props, hooks), the implementation is pure Go and takes advantage of Go's strengths like goroutines for async operations.
+This guide explains how to use the VDOM system to create interactive applications that run in Wave Terminal. While the patterns will feel familiar to React developers (components, props, hooks), the implementation is pure Go and takes advantage of Go's strengths like goroutines for async operations. Note that complex browser-side interactions like drag-and-drop, rich text editing, or heavy JavaScript functionality are not supported - the framework is designed for straightforward, practical terminal-based applications.
 
 You'll learn how to:
 - Create and compose components
@@ -602,5 +602,6 @@ type AppOpts struct {
 - Call SendAsyncInitiation() after async state updates
 - Provide keys when using ForEach() with lists
 - Consider cleanup functions in UseEffect() for async operations
+- <script> tags are not supported
 
 The attached todo app demonstrates all these patterns in a complete application.

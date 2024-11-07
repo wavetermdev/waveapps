@@ -1,0 +1,23 @@
+.graph-container {
+    padding: 24px;
+    background: #1a1a1a;
+    border-radius: 8px;
+    color: #ffffff;
+}
+
+.graph-title {
+    margin: 0 0 16px 0;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.graph-canvas {
+    background: #000000;
+    border-radius: 4px;
+    margin-bottom: 16px;
+}
+
+.graph-stats {
+    font-family: monospace;
+    color: #888888;
+}
