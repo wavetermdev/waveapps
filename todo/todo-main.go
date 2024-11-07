@@ -11,7 +11,7 @@ import (
 //go:embed style.css
 var styleCSS []byte
 
-var TodoVDomClient *vdomclient.Client = vdomclient.MakeClient(vdomclient.ApplicationOpts{
+var TodoVDomClient *vdomclient.Client = vdomclient.MakeClient(vdomclient.AppOpts{
 	CloseOnCtrlC: true,
 	GlobalStyles: styleCSS,
 })

@@ -13,7 +13,7 @@ import (
 //go:embed style.css
 var styleCSS []byte
 
-var PomodoroVDomClient *vdomclient.Client = vdomclient.MakeClient(vdomclient.ApplicationOpts{
+var PomodoroVDomClient *vdomclient.Client = vdomclient.MakeClient(vdomclient.AppOpts{
 	CloseOnCtrlC: true,
 	GlobalStyles: styleCSS,
 })

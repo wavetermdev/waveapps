@@ -19,7 +19,7 @@ var styleCSS []byte
 // Command-line args (accessible in components)
 var galleryPath string
 
-var GalleryClient *vdomclient.Client = vdomclient.MakeClient(vdomclient.ApplicationOpts{
+var GalleryClient *vdomclient.Client = vdomclient.MakeClient(vdomclient.AppOpts{
 	CloseOnCtrlC: true,
 	GlobalStyles: styleCSS,
 })

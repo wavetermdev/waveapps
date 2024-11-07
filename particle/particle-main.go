@@ -12,7 +12,7 @@ import (
 	"github.com/wavetermdev/waveterm/pkg/vdom/vdomclient"
 )
 
-var ParticleVDomClient *vdomclient.Client = vdomclient.MakeClient(vdomclient.ApplicationOpts{
+var ParticleVDomClient *vdomclient.Client = vdomclient.MakeClient(vdomclient.AppOpts{
 	CloseOnCtrlC: true,
 })
 
