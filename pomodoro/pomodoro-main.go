@@ -14,8 +14,6 @@ import (
 var styleCSS []byte
 
 var PomodoroVDomClient *vdomclient.Client = vdomclient.MakeClient(vdomclient.ApplicationOpts{
-	Name:         "pomodoro",
-	Description:  "pomodoro timer application",
 	CloseOnCtrlC: true,
 	GlobalStyles: styleCSS,
 })

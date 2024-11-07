@@ -2,10 +2,7 @@ module vdomtest
 
 go 1.22.4
 
-require (
-	github.com/spf13/cobra v1.8.1
-	github.com/wavetermdev/waveterm v0.9.1
-)
+require github.com/wavetermdev/waveterm v0.9.1
 
 require (
 	github.com/alexflint/go-filemutex v1.3.0 // indirect
@@ -13,9 +10,7 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/mux v1.8.1 // indirect
-	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
-	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/stretchr/testify v1.9.0 // indirect
 	github.com/wavetermdev/htmltoken v0.2.0 // indirect
 	golang.org/x/net v0.29.0 // indirect

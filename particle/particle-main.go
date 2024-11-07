@@ -13,8 +13,6 @@ import (
 )
 
 var ParticleVDomClient *vdomclient.Client = vdomclient.MakeClient(vdomclient.ApplicationOpts{
-	Name:         "particle",
-	Description:  "particle canvas application",
 	CloseOnCtrlC: true,
 })
 
