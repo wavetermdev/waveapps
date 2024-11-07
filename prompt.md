@@ -603,5 +603,10 @@ type AppOpts struct {
 - Provide keys when using ForEach() with lists
 - Consider cleanup functions in UseEffect() for async operations
 - <script> tags are not supported
+- Applications consist of exactly two files:
+  - main.go: Contains all Go code and component definitions
+  - style.css: Contains all styling (embedded into the app)
+- This is a pure Go system - do not attempt to write React components or JavaScript code
+- All UI rendering, including complex visualizations, should be done through Go using vdom.E()
 
 The attached todo app demonstrates all these patterns in a complete application.
