@@ -1,0 +1,58 @@
+.toolbar {
+    --low-usage: var(--term-bright-green);
+    --medium-usage: var(--term-bright-yellow);
+    --high-usage: var(--term-bright-red);
+    --text-color: var(--term-cmdtext);
+    --secondary-text: var(--term-gray);
+    --divider-color: var(--term-bright-black);
+}
+
+.toolbar {
+    height: 1.5em;
+    line-height: 1.5em;
+    padding: 0 0.5em;
+    display: flex;
+    align-items: center;
+    font-family: system-ui, -apple-system, sans-serif;
+    gap: 1em;
+    color: var(--text-color);
+}
+
+.metric-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+}
+
+.label {
+    font-size: 0.8em;
+    color: var(--secondary-text);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.value {
+    font-size: 0.9em;
+    min-width: 3em;
+    color: var(--term-foreground);
+}
+
+.progress-container {
+    width: 4em;
+    height: 0.5em;
+    background: var(--term-bright-black);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.divider {
+    width: 1px;
+    height: 1em;
+    background: var(--divider-color);
+    margin: 0 0.25em;
+}
