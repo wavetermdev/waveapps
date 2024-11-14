@@ -1,6 +1,6 @@
-# VDOM Canvas Operations Guide
+# WaveApp Canvas Operations Guide
 
-The VDOM system provides a powerful way to interact with HTML Canvas elements through the `QueueRefOp` function. This guide explains how to use canvas operations effectively in your VDOM applications.
+The WaveApp system provides a powerful way to interact with HTML Canvas elements through the `QueueRefOp` function. This guide explains how to use canvas operations effectively in your WaveApp applications.
 
 ## Basic Canvas Setup
 
@@ -35,7 +35,7 @@ vdom.QueueRefOp(ctx, canvasRef, vdom.VDomRefOperation{
 
 ## Reference Management
 
-The VDOM canvas system has two key uses for references:
+The WaveApp canvas system has two key uses for references:
 
 1. **Capturing Canvas API Return Values**  
 Some canvas operations return objects (like gradients) that cannot be directly serialized. Use the `Ref` field to capture these return values:
@@ -255,4 +255,4 @@ var CanvasUpdater = waveapp.DefineComponent[CanvasUpdaterProps](
 )
 ```
 
-This guide covers the essential patterns for working with Canvas in VDOM applications. Remember that while Canvas operations are powerful, they should be used judiciously in terminal-based applications to maintain good performance.
+This guide covers the essential patterns for working with Canvas in WaveApp applications. Remember that while Canvas operations are powerful, they should be used judiciously in terminal-based applications to maintain good performance.

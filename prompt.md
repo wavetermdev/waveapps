@@ -1,8 +1,8 @@
-# VDOM System Guide
+# WaveApp System Guide
 
-Wave Terminal includes a powerful VDOM (Virtual DOM) system that lets developers create rich HTML/React-based UI applications directly from Go code. The system translates Go components and elements into React components that are rendered within Wave Terminal's UI. It's particularly well-suited for administrative interfaces, monitoring dashboards, data visualization, configuration managers, and form-based applications where you want a graphical interface but don't need complex browser-side interactions.
+Wave Terminal includes a powerful WaveApp system that lets developers create rich HTML/React-based UI applications directly from Go code. The system translates Go components and elements into React components that are rendered within Wave Terminal's UI. It's particularly well-suited for administrative interfaces, monitoring dashboards, data visualization, configuration managers, and form-based applications where you want a graphical interface but don't need complex browser-side interactions.
 
-This guide explains how to use the VDOM system to create interactive applications that run in Wave Terminal. While the patterns will feel familiar to React developers (components, props, hooks), the implementation is pure Go and takes advantage of Go's strengths like goroutines for async operations. Note that complex browser-side interactions like drag-and-drop, rich text editing, or heavy JavaScript functionality are not supported - the framework is designed for straightforward, practical terminal-based applications.
+This guide explains how to use the WaveApp system (and corresponding VDOM, virtual DOM, component) to create interactive applications that run in Wave Terminal. While the patterns will feel familiar to React developers (components, props, hooks), the implementation is pure Go and takes advantage of Go's strengths like goroutines for async operations. Note that complex browser-side interactions like drag-and-drop, rich text editing, or heavy JavaScript functionality are not supported - the framework is designed for straightforward, practical terminal-based applications.
 
 You'll learn how to:
 - Create and compose components
@@ -15,7 +15,7 @@ The included todo-main.go provides a complete example application showing these 
 
 ## Client Setup and Registration
 
-The VDOM client should be created as a global variable using AppOpts:
+The WaveApp client should be created as a global variable using AppOpts:
 
 ```go
 // Create client at package level
@@ -377,7 +377,7 @@ Best Practices:
      
 ## State Management and Async Updates
 
-While React patterns typically avoid globals, in Go VDOM applications it's perfectly fine and often clearer to use global variables. However, when dealing with async operations and goroutines, special care must be taken:
+While React patterns typically avoid globals, in Go WaveApp applications it's perfectly fine and often clearer to use global variables. However, when dealing with async operations and goroutines, special care must be taken:
 
 ```go
 // Global state is fine!
@@ -467,7 +467,7 @@ Key points for state management:
 
 ## File Handling
 
-The VDOM system can serve files to components. Any URL starting with `vdom://` will be handled by the registered handlers:
+The WaveApp system can serve files to components. Any URL starting with `vdom://` will be handled by the registered handlers:
 
 ```go
 // Register handlers for files (in the main func)
@@ -510,7 +510,7 @@ Note that the system will attempt to detect the file type using the first 512 by
 
 By default, files will not be cached.  If you'd like to enable caching, pass an ETag.  If a subsequent request comes and the ETag matches the system will used the cached content.
 
-## VDOM Application Template
+## WaveApp Template
 
 ```go
 package main
