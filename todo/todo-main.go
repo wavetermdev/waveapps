@@ -5,13 +5,13 @@ import (
 	_ "embed"
 
 	"github.com/wavetermdev/waveterm/pkg/vdom"
-	"github.com/wavetermdev/waveterm/pkg/vdom/vdomclient"
+	"github.com/wavetermdev/waveterm/pkg/waveapp"
 )
 
 //go:embed style.css
 var styleCSS []byte
 
-var TodoVDomClient *vdomclient.Client = vdomclient.MakeClient(vdomclient.AppOpts{
+var AppClient *waveapp.Client = waveapp.MakeClient(waveapp.AppOpts{
 	CloseOnCtrlC: true,
 	GlobalStyles: styleCSS,
 })
@@ -40,7 +40,7 @@ type InputFieldProps struct {
 	OnEnter  func()       `json:"onEnter"`
 }
 
-var InputField = vdomclient.DefineComponent[InputFieldProps](TodoVDomClient, "InputField",
+var InputField = waveapp.DefineComponent[InputFieldProps](AppClient, "InputField",
 	func(ctx context.Context, props InputFieldProps) any {
 		keyDown := &vdom.VDomFunc{
 			Type: vdom.ObjectType_Func,
@@ -67,7 +67,7 @@ var InputField = vdomclient.DefineComponent[InputFieldProps](TodoVDomClient, "In
 	},
 )
 
-var TodoItem = vdomclient.DefineComponent(TodoVDomClient, "TodoItem",
+var TodoItem = waveapp.DefineComponent(AppClient, "TodoItem",
 	func(ctx context.Context, props TodoItemProps) any {
 		return vdom.E("div",
 			vdom.Class("todo-item"),
@@ -91,7 +91,7 @@ var TodoItem = vdomclient.DefineComponent(TodoVDomClient, "TodoItem",
 	},
 )
 
-var TodoList = vdomclient.DefineComponent(TodoVDomClient, "TodoList",
+var TodoList = waveapp.DefineComponent(AppClient, "TodoList",
 	func(ctx context.Context, props TodoListProps) any {
 		return vdom.E("div",
 			vdom.Class("todo-list"),
@@ -106,7 +106,7 @@ var TodoList = vdomclient.DefineComponent(TodoVDomClient, "TodoList",
 	},
 )
 
-var App = vdomclient.DefineComponent(TodoVDomClient, "App",
+var App = waveapp.DefineComponent(AppClient, "App",
 	func(ctx context.Context, _ any) any {
 		// State using hooks
 		todos, setTodos := vdom.UseState(ctx, []Todo{
@@ -183,5 +183,5 @@ var App = vdomclient.DefineComponent(TodoVDomClient, "App",
 )
 
 func main() {
-	TodoVDomClient.RunMain()
+	AppClient.RunMain()
 }

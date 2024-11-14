@@ -9,10 +9,10 @@ import (
 	"time"
 
 	"github.com/wavetermdev/waveterm/pkg/vdom"
-	"github.com/wavetermdev/waveterm/pkg/vdom/vdomclient"
+	"github.com/wavetermdev/waveterm/pkg/waveapp"
 )
 
-var ParticleVDomClient *vdomclient.Client = vdomclient.MakeClient(vdomclient.AppOpts{
+var AppClient *waveapp.Client = waveapp.MakeClient(waveapp.AppOpts{
 	CloseOnCtrlC: true,
 })
 
@@ -28,7 +28,7 @@ type CanvasUpdaterProps struct {
 	CanvasRef *vdom.VDomRef
 }
 
-var CanvasUpdaterParticles = vdomclient.DefineComponent[CanvasUpdaterProps](ParticleVDomClient, "CanvasUpdaterParticles",
+var CanvasUpdaterParticles = waveapp.DefineComponent[CanvasUpdaterProps](AppClient, "CanvasUpdaterParticles",
 	func(ctx context.Context, props CanvasUpdaterProps) any {
 		particles, setParticles := vdom.UseState(ctx, initParticles(10))
 		lastRenderTs := vdom.UseRef(ctx, int64(0))
@@ -76,7 +76,7 @@ var CanvasUpdaterParticles = vdomclient.DefineComponent[CanvasUpdaterProps](Part
 			// Trigger re-render based on tickNum, not particles
 			go func() {
 				time.Sleep(60 * time.Millisecond)
-				ParticleVDomClient.SendAsyncInitiation()
+				AppClient.SendAsyncInitiation()
 			}()
 
 			return nil
@@ -129,7 +129,7 @@ func updateParticles(particles []Particle) []Particle {
 	return particles
 }
 
-var App = vdomclient.DefineComponent[struct{}](ParticleVDomClient, "App",
+var App = waveapp.DefineComponent[struct{}](AppClient, "App",
 	func(ctx context.Context, _ struct{}) any {
 		canvasRef := vdom.UseVDomRef(ctx)
 		return vdom.E("div",
@@ -144,5 +144,5 @@ var App = vdomclient.DefineComponent[struct{}](ParticleVDomClient, "App",
 )
 
 func main() {
-	ParticleVDomClient.RunMain()
+	AppClient.RunMain()
 }

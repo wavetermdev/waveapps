@@ -19,13 +19,13 @@ The VDOM client should be created as a global variable using AppOpts:
 
 ```go
 // Create client at package level
-var AppClient *vdomclient.Client = vdomclient.MakeClient(vdomclient.AppOpts{
+var AppClient *waveapp.Client = waveapp.MakeClient(waveapp.AppOpts{
     CloseOnCtrlC: true,
     GlobalStyles: styleCSS,
 })
 
 // Components are registered with the client
-var MyComponent = vdomclient.DefineComponent[MyProps](AppClient, "MyComponent",
+var MyComponent = waveapp.DefineComponent[MyProps](AppClient, "MyComponent",
     func(ctx context.Context, props MyProps) any {
         // component logic
     },
@@ -183,7 +183,7 @@ Embed and provide them through AppOpts:
 //go:embed style.css
 var styleCSS []byte
 
-var AppClient *vdomclient.Client = vdomclient.MakeClient(vdomclient.AppOpts{
+var AppClient *waveapp.Client = waveapp.MakeClient(waveapp.AppOpts{
     CloseOnCtrlC: true,
     GlobalStyles: styleCSS,
 })
@@ -199,7 +199,7 @@ type TodoItemProps struct {
     OnToggle func()  `json:"onToggle"`
 }
 
-var TodoItem = vdomclient.DefineComponent[TodoItemProps](AppClient, "TodoItem",
+var TodoItem = waveapp.DefineComponent[TodoItemProps](AppClient, "TodoItem",
     func(ctx context.Context, props TodoItemProps) any {
         return vdom.E("div",
             vdom.P("className", "todo-item"),
@@ -391,7 +391,7 @@ type TimerState struct {
     isActive bool
 }
 
-var TodoApp = vdomclient.DefineComponent[struct{}](AppClient, "TodoApp",
+var TodoApp = waveapp.DefineComponent[struct{}](AppClient, "TodoApp",
     func(ctx context.Context, _ struct{}) any {
         // Local state for UI updates
         count, setCount := vdom.UseState(ctx, 0)
@@ -471,13 +471,13 @@ The VDOM system can serve files to components. Any URL starting with `vdom://` w
 
 ```go
 // Register handlers for files (in the main func)
-AppClient.RegisterFileHandler("/logo.png", vdomclient.FileHandlerOption{
+AppClient.RegisterFileHandler("/logo.png", waveapp.FileHandlerOption{
     FilePath: "./assets/logo.png",
 })
 
 // returning nil will produce a 404, path will be the full path, including the prefix
-AppClient.RegisterFilePrefixHandler("/img/", func(path string) (*vdomclient.FileHandlerOption, error) {
-    return &vdomclient.FileHandlerOption{Data: data, MimeType: "image/png"}
+AppClient.RegisterFilePrefixHandler("/img/", func(path string) (*waveapp.FileHandlerOption, error) {
+    return &waveapp.FileHandlerOption{Data: data, MimeType: "image/png"}
 })
 
 // Use in components with vdom:// prefix
@@ -522,7 +522,7 @@ import (
     "fmt"
     "os"
     "github.com/wavetermdev/waveterm/pkg/vdom"
-    "github.com/wavetermdev/waveterm/pkg/vdom/vdomclient"
+    "github.com/wavetermdev/waveterm/pkg/waveapp"
 )
 
 //go:embed style.css
@@ -532,13 +532,13 @@ var styleCSS []byte
 var myPath string
 var verbose = flag.Bool("v", false, "verbose output")
 
-var AppClient = vdomclient.MakeClient(vdomclient.AppOpts{
+var AppClient = waveapp.MakeClient(waveapp.AppOpts{
     CloseOnCtrlC: true,
     GlobalStyles: styleCSS,
 })
 
 // Root component must be named "App" (it takes no props)
-var App = vdomclient.DefineComponent(AppClient, "App",
+var App = waveapp.DefineComponent(AppClient, "App",
     func(ctx context.Context, _ any) any {
         count, setCount := vdom.UseState(ctx, 0)
         return vdom.E("div", nil,
@@ -566,7 +566,7 @@ func main() {
     myPath = flag.Arg(0)
     
     // Optional: Add URL handlers
-    AppClient.RegisterFileHandler("/api/data", vdomclient.FileHandlerOption{...})
+    AppClient.RegisterFileHandler("/api/data", waveapp.FileHandlerOption{...})
     AppClient.RegisterFilePrefixHandler("/img/", imageHandler)
     
     // Run the app
@@ -597,7 +597,7 @@ type AppOpts struct {
 - Props must be defined as Go structs with json tags
 - Components take their props type directly: `func MyComponent(ctx context.Context, props MyProps) any`
 - Use vdom.Props() when passing structured props to vdom.E()
-- Always use vdomclient.DefineComponent with the client instance
+- Always use waveapp.DefineComponent with the client instance
 - Use PStyle for cleaner style property setting
 - Call SendAsyncInitiation() after async state updates
 - Provide keys when using ForEach() with lists

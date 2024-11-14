@@ -192,7 +192,7 @@ type CanvasUpdaterProps struct {
     CanvasRef *vdom.VDomRef
 }
 
-var CanvasUpdater = vdomclient.DefineComponent[CanvasUpdaterProps](
+var CanvasUpdater = waveapp.DefineComponent[CanvasUpdaterProps](
     Client, "CanvasUpdater",
     func(ctx context.Context, props CanvasUpdaterProps) any {
         particles, setParticles := vdom.UseState(ctx, initParticles(10))

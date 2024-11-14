@@ -7,13 +7,13 @@ import (
 	"time"
 
 	"github.com/wavetermdev/waveterm/pkg/vdom"
-	"github.com/wavetermdev/waveterm/pkg/vdom/vdomclient"
+	"github.com/wavetermdev/waveterm/pkg/waveapp"
 )
 
 //go:embed style.css
 var styleCSS []byte
 
-var PomodoroVDomClient *vdomclient.Client = vdomclient.MakeClient(vdomclient.AppOpts{
+var AppClient *waveapp.Client = waveapp.MakeClient(waveapp.AppOpts{
 	CloseOnCtrlC: true,
 	GlobalStyles: styleCSS,
 })
@@ -50,7 +50,7 @@ type TimerState struct {
 	isActive  bool // Track if the timer goroutine is running
 }
 
-var TimerDisplay = vdomclient.DefineComponent[TimerDisplayProps](PomodoroVDomClient, "TimerDisplay",
+var TimerDisplay = waveapp.DefineComponent[TimerDisplayProps](AppClient, "TimerDisplay",
 	func(ctx context.Context, props TimerDisplayProps) any {
 		return vdom.E("div",
 			vdom.Class("timer-display"),
@@ -66,7 +66,7 @@ var TimerDisplay = vdomclient.DefineComponent[TimerDisplayProps](PomodoroVDomCli
 	},
 )
 
-var ControlButtons = vdomclient.DefineComponent[ControlButtonsProps](PomodoroVDomClient, "ControlButtons",
+var ControlButtons = waveapp.DefineComponent[ControlButtonsProps](AppClient, "ControlButtons",
 	func(ctx context.Context, props ControlButtonsProps) any {
 		return vdom.E("div",
 			vdom.Class("control-buttons"),
@@ -104,7 +104,7 @@ var ControlButtons = vdomclient.DefineComponent[ControlButtonsProps](PomodoroVDo
 	},
 )
 
-var App = vdomclient.DefineComponent[struct{}](PomodoroVDomClient, "App",
+var App = waveapp.DefineComponent[struct{}](AppClient, "App",
 	func(ctx context.Context, _ struct{}) any {
 		isRunning, setIsRunning := vdom.UseState(ctx, false)
 		minutes, setMinutes := vdom.UseState(ctx, WorkMode.Duration)
@@ -158,7 +158,7 @@ var App = vdomclient.DefineComponent[struct{}](PomodoroVDomClient, "App",
 							setSeconds(0)
 							setIsComplete(true)
 							stopTimer()
-							PomodoroVDomClient.SendAsyncInitiation()
+							AppClient.SendAsyncInitiation()
 							return
 						}
 
@@ -169,7 +169,7 @@ var App = vdomclient.DefineComponent[struct{}](PomodoroVDomClient, "App",
 						if m != minutes || s != seconds {
 							setMinutes(m)
 							setSeconds(s)
-							PomodoroVDomClient.SendAsyncInitiation()
+							AppClient.SendAsyncInitiation()
 						}
 					}
 				}
@@ -179,7 +179,7 @@ var App = vdomclient.DefineComponent[struct{}](PomodoroVDomClient, "App",
 		pauseTimer := func() {
 			stopTimer()
 			setIsRunning(false)
-			PomodoroVDomClient.SendAsyncInitiation()
+			AppClient.SendAsyncInitiation()
 		}
 
 		resetTimer := func() {
@@ -192,7 +192,7 @@ var App = vdomclient.DefineComponent[struct{}](PomodoroVDomClient, "App",
 				setMinutes(BreakMode.Duration)
 			}
 			setSeconds(0)
-			PomodoroVDomClient.SendAsyncInitiation()
+			AppClient.SendAsyncInitiation()
 		}
 
 		changeMode := func(duration int) {
@@ -206,7 +206,7 @@ var App = vdomclient.DefineComponent[struct{}](PomodoroVDomClient, "App",
 			} else {
 				setMode(BreakMode.Name)
 			}
-			PomodoroVDomClient.SendAsyncInitiation()
+			AppClient.SendAsyncInitiation()
 		}
 
 		// Cleanup on unmount
@@ -239,5 +239,5 @@ var App = vdomclient.DefineComponent[struct{}](PomodoroVDomClient, "App",
 )
 
 func main() {
-	PomodoroVDomClient.RunMain()
+	AppClient.RunMain()
 }

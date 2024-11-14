@@ -9,7 +9,7 @@ import (
 	"log"
 
 	"github.com/wavetermdev/waveterm/pkg/vdom"
-	"github.com/wavetermdev/waveterm/pkg/vdom/vdomclient"
+	"github.com/wavetermdev/waveterm/pkg/waveapp"
 	"github.com/wavetermdev/waveterm/pkg/waveobj"
 	"github.com/wavetermdev/waveterm/pkg/wshrpc"
 	"github.com/wavetermdev/waveterm/pkg/wshrpc/wshclient"
@@ -18,16 +18,10 @@ import (
 //go:embed style.css
 var styleCSS []byte
 
-var HtmlVDomClient *vdomclient.Client = vdomclient.MakeClient(vdomclient.AppOpts{
+var AppClient *waveapp.Client = waveapp.MakeClient(waveapp.AppOpts{
 	CloseOnCtrlC: true,
 	GlobalStyles: styleCSS,
 })
-
-func init() {
-	HtmlVDomClient.AddSetupFn(func() {
-
-	})
-}
 
 // Prop Types
 type BgItemProps struct {
@@ -46,7 +40,7 @@ type BgItem struct {
 }
 
 // Components
-var Style = vdomclient.DefineComponent[struct{}](HtmlVDomClient, "Style",
+var Style = waveapp.DefineComponent[struct{}](AppClient, "Style",
 	func(ctx context.Context, _ struct{}) any {
 		return vdom.E("wave:style",
 			vdom.P("src", "vdom:///style.css"),
@@ -54,7 +48,7 @@ var Style = vdomclient.DefineComponent[struct{}](HtmlVDomClient, "Style",
 	},
 )
 
-var BgItemTag = vdomclient.DefineComponent[BgItemProps](HtmlVDomClient, "BgItem",
+var BgItemTag = waveapp.DefineComponent[BgItemProps](AppClient, "BgItem",
 	func(ctx context.Context, props BgItemProps) any {
 		return vdom.E("div",
 			vdom.Class("bg-item"),
@@ -71,16 +65,16 @@ var BgItemTag = vdomclient.DefineComponent[BgItemProps](HtmlVDomClient, "BgItem"
 	},
 )
 
-var BgList = vdomclient.DefineComponent[BgListProps](HtmlVDomClient, "BgList",
+var BgList = waveapp.DefineComponent[BgListProps](AppClient, "BgList",
 	func(ctx context.Context, props BgListProps) any {
 		setBackground := func(bg string) func() {
 			return func() {
-				blockInfo, err := wshclient.BlockInfoCommand(HtmlVDomClient.RpcClient, HtmlVDomClient.RpcContext.BlockId, nil)
+				blockInfo, err := wshclient.BlockInfoCommand(AppClient.RpcClient, AppClient.RpcContext.BlockId, nil)
 				if err != nil {
 					log.Printf("error getting block info: %v\n", err)
 					return
 				}
-				err = wshclient.SetMetaCommand(HtmlVDomClient.RpcClient, wshrpc.CommandSetMetaData{
+				err = wshclient.SetMetaCommand(AppClient.RpcClient, wshrpc.CommandSetMetaData{
 					ORef: waveobj.ORef{OType: "tab", OID: blockInfo.TabId},
 					Meta: map[string]any{"bg": bg},
 				}, nil)
@@ -106,7 +100,7 @@ var BgList = vdomclient.DefineComponent[BgListProps](HtmlVDomClient, "BgList",
 	},
 )
 
-var App = vdomclient.DefineComponent[struct{}](HtmlVDomClient, "App",
+var App = waveapp.DefineComponent[struct{}](AppClient, "App",
 	func(ctx context.Context, _ struct{}) any {
 		inputText, setInputText := vdom.UseState(ctx, "start")
 
@@ -156,8 +150,8 @@ var App = vdomclient.DefineComponent[struct{}](HtmlVDomClient, "App",
 )
 
 func main() {
-	HtmlVDomClient.RegisterFileHandler("/test.png", vdomclient.FileHandlerOption{
+	AppClient.RegisterFileHandler("/test.png", waveapp.FileHandlerOption{
 		FilePath: "~/Downloads/IMG_1939.png",
 	})
-	HtmlVDomClient.RunMain()
+	AppClient.RunMain()
 }

@@ -9,13 +9,13 @@ import (
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/load"
 	"github.com/wavetermdev/waveterm/pkg/vdom"
-	"github.com/wavetermdev/waveterm/pkg/vdom/vdomclient"
+	"github.com/wavetermdev/waveterm/pkg/waveapp"
 )
 
 //go:embed style.css
 var styleCSS []byte
 
-var AppClient = vdomclient.MakeClient(vdomclient.AppOpts{
+var AppClient = waveapp.MakeClient(waveapp.AppOpts{
 	CloseOnCtrlC:  true,
 	GlobalStyles:  styleCSS,
 	TargetToolbar: &vdom.VDomTargetToolbar{Toolbar: true, Height: "1.5em"},
@@ -26,7 +26,7 @@ type Metrics struct {
 	LoadAvg    [3]float64
 }
 
-var App = vdomclient.DefineComponent(AppClient, "App",
+var App = waveapp.DefineComponent(AppClient, "App",
 	func(ctx context.Context, _ any) any {
 		metrics, setMetrics := vdom.UseState(ctx, Metrics{})
 

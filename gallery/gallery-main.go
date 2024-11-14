@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/wavetermdev/waveterm/pkg/vdom"
-	"github.com/wavetermdev/waveterm/pkg/vdom/vdomclient"
+	"github.com/wavetermdev/waveterm/pkg/waveapp"
 )
 
 //go:embed style.css
@@ -19,7 +19,7 @@ var styleCSS []byte
 // Command-line args (accessible in components)
 var galleryPath string
 
-var GalleryClient *vdomclient.Client = vdomclient.MakeClient(vdomclient.AppOpts{
+var AppClient *waveapp.Client = waveapp.MakeClient(waveapp.AppOpts{
 	CloseOnCtrlC: true,
 	GlobalStyles: styleCSS,
 })
@@ -42,7 +42,7 @@ type ImageViewProps struct {
 	HasPrev bool      `json:"hasPrev"`
 }
 
-var ImageView = vdomclient.DefineComponent[ImageViewProps](GalleryClient, "ImageView",
+var ImageView = waveapp.DefineComponent[ImageViewProps](AppClient, "ImageView",
 	func(ctx context.Context, props ImageViewProps) any {
 		return vdom.E("div",
 			vdom.Class("image-view"),
@@ -77,7 +77,7 @@ var ImageView = vdomclient.DefineComponent[ImageViewProps](GalleryClient, "Image
 	},
 )
 
-var App = vdomclient.DefineComponent(GalleryClient, "App",
+var App = waveapp.DefineComponent(AppClient, "App",
 	func(ctx context.Context, _ any) any {
 		// Get images from the provided path
 		images, err := scanDirectory(galleryPath)
@@ -198,7 +198,7 @@ func scanDirectory(root string) ([]ImageInfo, error) {
 }
 
 func main() {
-	GalleryClient.RegisterDefaultFlags()
+	AppClient.RegisterDefaultFlags()
 	flag.Parse()
 	if flag.NArg() != 1 {
 		fmt.Fprintf(os.Stderr, "Usage: gallery [flags] <path>\n")
@@ -206,7 +206,7 @@ func main() {
 		os.Exit(1)
 	}
 	galleryPath = flag.Arg(0)
-	GalleryClient.RegisterFilePrefixHandler("/img/", func(path string) (*vdomclient.FileHandlerOption, error) {
+	AppClient.RegisterFilePrefixHandler("/img/", func(path string) (*waveapp.FileHandlerOption, error) {
 		imgPath := strings.TrimPrefix(path, "/img/")
 		fullPath := filepath.Join(galleryPath, imgPath)
 
@@ -227,10 +227,10 @@ func main() {
 			return nil, err
 		}
 
-		return &vdomclient.FileHandlerOption{
+		return &waveapp.FileHandlerOption{
 			Data: data,
 			ETag: etag,
 		}, nil
 	})
-	GalleryClient.RunMain()
+	AppClient.RunMain()
 }

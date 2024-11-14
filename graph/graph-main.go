@@ -11,13 +11,13 @@ import (
 	"strings"
 
 	"github.com/wavetermdev/waveterm/pkg/vdom"
-	"github.com/wavetermdev/waveterm/pkg/vdom/vdomclient"
+	"github.com/wavetermdev/waveterm/pkg/waveapp"
 )
 
 //go:embed style.css
 var styleCSS []byte
 
-var AppClient = vdomclient.MakeClient(vdomclient.AppOpts{
+var AppClient = waveapp.MakeClient(waveapp.AppOpts{
 	CloseOnCtrlC: true,
 	GlobalStyles: styleCSS,
 })
@@ -46,7 +46,7 @@ func calculateStats(points []DataPoint) (count int, avg float64) {
 	return count, sum / float64(count)
 }
 
-var App = vdomclient.DefineComponent(AppClient, "App",
+var App = waveapp.DefineComponent(AppClient, "App",
 	func(ctx context.Context, _ any) any {
 		// State for our data points and update counter
 		points, _, setPointsFn := vdom.UseStateWithFn(ctx, []DataPoint{})
