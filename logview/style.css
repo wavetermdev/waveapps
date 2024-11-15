@@ -1,0 +1,75 @@
+.log-viewer {
+    padding: 1rem;
+    font-family: monospace;
+    height: calc(100vh - 2rem);
+    display: flex;
+    flex-direction: column;
+}
+
+.log-header {
+    margin-bottom: 1rem;
+    flex: 0 0 auto;
+}
+
+.log-info {
+    color: #666;
+    margin-bottom: 1rem;
+}
+
+.filter-container {
+    margin-bottom: 1rem;
+}
+
+.filter-input {
+    width: 100%;
+    padding: 0.5rem;
+    font-family: monospace;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid #666;
+    border-radius: 4px;
+    color: #fff;
+}
+
+.filter-input::placeholder {
+    color: #666;
+}
+
+.filter-input:focus {
+    outline: none;
+    border-color: #888;
+}
+
+.log-content {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 1rem;
+    border-radius: 4px;
+    margin: 0;
+    flex: 1 1 auto;
+    overflow: auto;
+    white-space: pre;
+}
+
+.log-line {
+    padding: 0.125rem 0;
+}
+
+.log-line:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.line-number {
+    color: #666;
+    padding-right: 1rem;
+    user-select: none;
+}
+
+.line-content {
+    color: #fff;
+}
+
+.log-error {
+    color: #ff4444;
+    padding: 1rem;
+    background: rgba(255, 0, 0, 0.1);
+    border-radius: 4px;
+}

@@ -224,6 +224,8 @@ var AppClient *waveapp.Client = waveapp.MakeClient(waveapp.AppOpts{
 })
 ```
 
+Note that the default environment where these apps will launch is a dark mode terminal.  So try to pick text colors and background colors that will work well against a dark client.  Normally the background is transparent (to a dark-ish background).  So either try to leave the background transparent (untouched), or if the transparency is not desirable, then choose a dark background color that would be appropriate.
+
 ## Component Definition Pattern
 
 Create typed, reusable components using the client:
