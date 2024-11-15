@@ -173,7 +173,8 @@ Helper functions:
 - `vdom.Filter[T any](items []T, fn func(T) bool) []T` - Filters items based on condition
 - `vdom.FilterIdx[T any](items []T, fn func(T, int) bool) []T` - Filters items with index access
 
-The same If/IfElse functions are used for both conditional rendering and conditional classes, always following the pattern of condition first, then value(s).
+- The same If/IfElse functions are used for both conditional rendering and conditional classes, always following the pattern of condition first, then value(s).
+- Remember to use vdom.IfElse if you need a true ternary condition.  vdom.If will return nil on false and does not allow a 3rd argument.
 
 ## Style Handling
 
@@ -554,6 +555,79 @@ Key points for state management:
 - Use `UseEffect` cleanup function to handle component unmount
 - Call `SendAsyncInitiation()` after state changes in goroutines (consider round trip performance, so don't call at very high speeds)
 - Use atomic operations if globals are modified from multiple goroutines (or locks)
+
+## Global Keyboard Handling
+
+The WaveApp system provides two approaches for handling keyboard events:
+
+1. Standard DOM event handling on elements:
+```go
+vdom.H("div", map[string]any{
+    "onKeyDown": func(e vdom.VDomEvent) {
+        // Handle key event
+    },
+})
+```
+
+2. Global keyboard event handling:
+```go
+var AppClient = waveapp.MakeClient(waveapp.AppOpts{
+    CloseOnCtrlC:         true,
+    GlobalKeyboardEvents: true,  // Enable global keyboard events
+    GlobalStyles:         styleCSS,
+})
+
+// In main() or an effect:
+AppClient.SetGlobalEventHandler(func(client *waveapp.Client, event vdom.VDomEvent) {
+    if event.EventType != "onKeyDown" || event.KeyData == nil {
+        return
+    }
+
+    switch event.KeyData.Key {
+    case "ArrowUp":
+        // Handle up arrow
+    case "ArrowDown":
+        // Handle down arrow
+    }
+})
+```
+
+The global handler approach is particularly useful when:
+- You need to handle keyboard events regardless of focus state
+- Building terminal-like applications that need consistent keyboard control
+- Implementing application-wide keyboard shortcuts
+- Managing navigation in full-screen applications
+
+Key differences:
+- Standard DOM events require the element to have focus
+- Global events work regardless of focus state
+- Global events can be used alongside regular DOM event handlers
+- Global handler receives all keyboard events for the application
+
+The event handler receives a VDomEvent with KeyData for keyboard events:
+```go
+type VDomEvent struct {
+    EventType       string             // e.g., "onKeyDown"
+    KeyData         *WaveKeyboardEvent `json:"keydata,omitempty"`
+    // ... other fields
+}
+
+type WaveKeyboardEvent struct {
+    Type     string // "keydown", "keyup", "keypress"
+    Key      string // The key value (e.g., "ArrowUp")
+    Code     string // Physical key code
+    Shift    bool   // Modifier states
+    Control  bool
+    Alt      bool
+    Meta     bool
+    Cmd      bool   // Meta on Mac, Alt on Windows/Linux
+    Option   bool   // Alt on Mac, Meta on Windows/Linux
+}
+```
+
+When using global keyboard events, remember to:
+1. Enable GlobalKeyboardEvents in AppOpts
+2. Set up the handler in a place where you have access to necessary state updates
 
 ## File Handling
 
