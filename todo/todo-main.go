@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	_ "embed"
+	"strconv"
 
 	"github.com/wavetermdev/waveterm/pkg/vdom"
 	"github.com/wavetermdev/waveterm/pkg/waveapp"
@@ -12,7 +13,7 @@ import (
 var styleCSS []byte
 
 // Initialize client with embedded styles and ctrl-c handling
-var AppClient *waveapp.Client = waveapp.MakeClient(waveapp.AppOpts{
+var AppClient = waveapp.MakeClient(waveapp.AppOpts{
 	CloseOnCtrlC: true,
 	GlobalStyles: styleCSS,
 })
@@ -55,61 +56,54 @@ var InputField = waveapp.DefineComponent[InputFieldProps](AppClient, "InputField
 			Keys:            []string{"Enter", "Cmd:Enter"},
 		}
 
-		return vdom.E("input",
-			vdom.Class("todo-input"),
-			// Basic input element props
-			vdom.P("type", "text"),
-			vdom.P("placeholder", "What needs to be done?"),
-			vdom.P("value", props.Value),
-			// Event handler accessing target value
-			vdom.P("onChange", func(e vdom.VDomEvent) {
+		return vdom.H("input", map[string]any{
+			"className":   "todo-input",
+			"type":        "text",
+			"placeholder": "What needs to be done?",
+			"value":       props.Value,
+			"onChange": func(e vdom.VDomEvent) {
 				props.OnChange(e.TargetValue)
-			}),
-			vdom.P("onKeyDown", keyDown),
-		)
+			},
+			"onKeyDown": keyDown,
+		})
 	},
 )
 
 // Item component showing conditional classes and event handling
 var TodoItem = waveapp.DefineComponent(AppClient, "TodoItem",
 	func(ctx context.Context, props TodoItemProps) any {
-		return vdom.E("div",
-			vdom.Class("todo-item"),
-			// Conditional class example
-			vdom.ClassIf(props.Todo.Completed, "completed"),
-			vdom.E("input",
-				vdom.Class("todo-checkbox"),
-				vdom.P("type", "checkbox"),
-				vdom.P("checked", props.Todo.Completed),
-				vdom.P("onChange", props.OnToggle),
-			),
-			vdom.E("span",
-				vdom.Class("todo-text"),
-				props.Todo.Text,
-			),
-			vdom.E("button",
-				vdom.Class("todo-delete"),
-				vdom.P("onClick", props.OnDelete),
-				"×",
-			),
+		return vdom.H("div", map[string]any{
+			"className": vdom.Classes("todo-item", vdom.If(props.Todo.Completed, "completed")),
+		},
+			vdom.H("input", map[string]any{
+				"className": "todo-checkbox",
+				"type":      "checkbox",
+				"checked":   props.Todo.Completed,
+				"onChange":  props.OnToggle,
+			}),
+			vdom.H("span", map[string]any{
+				"className": "todo-text",
+			}, props.Todo.Text),
+			vdom.H("button", map[string]any{
+				"className": "todo-delete",
+				"onClick":   props.OnDelete,
+			}, "×"),
 		)
 	},
 )
 
-// List component demonstrating mapping over data
+// List component demonstrating mapping over data, using WithKey to set key on a component
 var TodoList = waveapp.DefineComponent(AppClient, "TodoList",
 	func(ctx context.Context, props TodoListProps) any {
-		return vdom.E("div",
-			vdom.Class("todo-list"),
-			// ForEach example with props passing
-			vdom.ForEach(props.Todos, func(todo Todo) any {
-				return TodoItem(TodoItemProps{
-					Todo:     todo,
-					OnToggle: func() { props.OnToggle(todo.Id) },
-					OnDelete: func() { props.OnDelete(todo.Id) },
-				})
-			}),
-		)
+		return vdom.H("div", map[string]any{
+			"className": "todo-list",
+		}, vdom.ForEach(props.Todos, func(todo Todo) any {
+			return TodoItem(TodoItemProps{
+				Todo:     todo,
+				OnToggle: func() { props.OnToggle(todo.Id) },
+				OnDelete: func() { props.OnDelete(todo.Id) },
+			}).WithKey(strconv.Itoa(todo.Id))
+		}))
 	},
 )
 
@@ -153,35 +147,33 @@ var App = waveapp.DefineComponent(AppClient, "App",
 
 		// Filter pattern for deletion
 		deleteTodo := func(id int) {
-			newTodos := make([]Todo, 0, len(todos)-1)
-			for _, todo := range todos {
-				if todo.Id != id {
-					newTodos = append(newTodos, todo)
-				}
-			}
+			newTodos := vdom.Filter(todos, func(todo Todo) bool {
+				return todo.Id != id
+			})
 			setTodos(newTodos)
 		}
 
-		return vdom.E("div",
-			vdom.Class("todo-app"),
-			vdom.E("div",
-				vdom.Class("todo-header"),
-				vdom.E("h1", nil, "Todo List"),
-			),
-			// Component composition with props
-			vdom.E("div",
-				vdom.Class("todo-form"),
+		return vdom.H("div", map[string]any{
+			"className": "todo-app",
+		},
+			vdom.H("div", map[string]any{
+				"className": "todo-header",
+			}, vdom.H("h1", nil, "Todo List")),
+
+			vdom.H("div", map[string]any{
+				"className": "todo-form",
+			},
 				InputField(InputFieldProps{
 					Value:    inputText,
 					OnChange: setInputText,
 					OnEnter:  addTodo,
 				}),
-				vdom.E("button",
-					vdom.Class("todo-button"),
-					vdom.P("onClick", addTodo),
-					"Add Todo",
-				),
+				vdom.H("button", map[string]any{
+					"className": "todo-button",
+					"onClick":   addTodo,
+				}, "Add Todo"),
 			),
+
 			TodoList(TodoListProps{
 				Todos:    todos,
 				OnToggle: toggleTodo,

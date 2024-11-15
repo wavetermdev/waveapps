@@ -32,87 +32,105 @@ var MyComponent = waveapp.DefineComponent[MyProps](AppClient, "MyComponent",
 )
 ```
 
-## Building Elements with vdom.E()
+## Building Elements with vdom.H()
 
-The E function creates virtual DOM elements. Its first argument is always a tag name (string), followed by any number of:
+The H function creates virtual DOM elements following a React-like pattern. It takes a tag name, a props map, and any number of children:
 
 ```go
-// Props can be set in several ways:
+// Basic element with no props
+vdom.H("div", nil, "Hello world")
 
-// 1. Individual props with P(name, value):
-vdom.E("div",
-    vdom.P("className", "my-class"),
-    vdom.P("onClick", handleClick),
-)
-
-// 2. Direct prop maps (map[string]any):
-vdom.E("div",
-    map[string]any{
-        "className": "container",
-        "id": "main",
+// Element with props
+vdom.H("div", map[string]any{
+    "className": "container",
+    "id": "main",
+    "onClick": func() {
+        fmt.Println("clicked!")
     },
+}, 
+    "child content",
 )
 
-// 3. Convert structs to props with Props():
-type ButtonProps struct {
-    Text    string `json:"text"`
-    OnClick func() `json:"onClick"`
-}
-vdom.E("Button", 
-    vdom.Props(ButtonProps{  // Props() required for structs
-        Text: "Click me",
-        OnClick: handleClick,
+// Element with style
+vdom.H("div", map[string]any{
+    "style": map[string]any{
+        "marginTop": 10,      // Numbers automatically convert to px
+        "color": "red",
+        "display": "flex",
+    },
+})
+
+// Working with classes
+vdom.H("div", map[string]any{
+    "className": vdom.Classes(
+        "base",                     // Static classes
+        vdom.If(isActive, "active"),    // Conditional class: condition first, then class
+        vdom.If(isDisabled, "disabled"), // Another conditional
+    ),
+})
+
+// Nesting elements
+vdom.H("div", map[string]any{
+    "className": "container",
+}, 
+    vdom.H("h1", map[string]any{
+        "className": "title",
+    }, "Hello"),
+    vdom.H("p", map[string]any{
+        "className": "content",
+    }, "Some content"),
+)
+
+// Handling events
+vdom.H("button", map[string]any{
+    "onClick": func() { 
+        handleClick() 
+    },
+    "onKeyDown": &vdom.VDomFunc{
+        Fn: handleKey,
+        Keys: []string{"Enter", "Space"},
+        PreventDefault: true,
+    },
+})
+
+// List rendering
+vdom.H("ul", nil,
+    vdom.ForEachIdx(items, func(item string, idx int) any {
+        return vdom.H("li", map[string]any{
+            "key": idx,
+            "className": "list-item",
+        }, item)
     }),
 )
 
-// 4. Class helpers (work directly in E() like P()):
-vdom.E("div",
-    vdom.Class("base"),                    // Always included
-    vdom.ClassIf(isActive, "active"),      // Included if condition true
-    vdom.ClassIfElse(isDone,              // Choose based on condition
-        "completed",
-        "pending",
-    ),
-)
-
-// Children can be:
-// 1. Other elements
-vdom.E("div",
-    vdom.E("span", nil, "Hello"),
-    vdom.E("span", nil, "World"),
-)
-
-// 2. Strings (become text nodes)
-vdom.E("div", "Hello world")
-
-// 3. Numbers (converted to string text nodes)
-vdom.E("div", 42)
-
-// 4. Arrays of any of the above
-elements := []any{
-    vdom.E("span", nil, "First"),
-    "Some text",
-    42,
-}
-vdom.E("div", elements)
-
-// Mix everything together:
-vdom.E("div",
-    vdom.Class("container"),          // base class
-    vdom.ClassIf(isActive, "active"), // conditional class
-    map[string]any{"id": "main"},     // prop map
-    vdom.E("h1", nil, "Title"),       // child element
-    "Some text",                      // text node
-    42,                               // number -> text node
-    elements,                         // array of children
+// Conditional rendering
+vdom.H("div", nil,
+    vdom.If(isVisible, vdom.H("span", nil, "Visible content")),
 )
 ```
 
-All arguments after the tag name can be:
-- Props: via P(), map[string]any, or Props(struct)
-- Classes: via Class(), ClassIf(), ClassIfElse().  Note that Class() only supports a single class.  To add multiple, use multiple calls.
-- Children: elements, strings, numbers, arrays
-- Anything with String() method (uses result as text node)
+Arguments to H:
+1. `tag` (string): The HTML tag name
+2. `props` (map[string]any or nil): Props map including:
+   - className: String of space-separated classes
+   - style: map[string]any of CSS properties
+   - Event handlers (onClick, onChange, etc)
+   - Any other valid HTML attributes
+3. `children` (...any): Any number of child elements:
+   - Other H() elements
+   - Strings (become text nodes)
+   - Numbers (converted to string)
+   - Arrays of the above
+   - nil values are ignored
+   - Anything with String() method becomes text
+
+Best practices:
+- Use Classes() with If() for conditional classes
+- Use camelCase for style properties (matching React)
+- Numbers in style are automatically converted to pixel values
+- Always create new slices when updating arrays in state
+- Use ForEach or ForEachIdx for list rendering
+- Include key prop when rendering lists
 
 ## Conditional Rendering and Lists
 
@@ -120,59 +138,76 @@ The system provides helper functions for conditional and list rendering:
 
 ```go
 // Conditional rendering with vdom.If()
-vdom.E("div",
-    vdom.If(isVisible, vdom.E("span", nil, "Visible content")),
-)
-
-// Branching with vdom.IfElse()
-vdom.E("div",
-    vdom.IfElse(isActive,
-        vdom.E("span", "Active"),
-        vdom.E("span", "Inactive"),
+vdom.H("div", nil,
+    vdom.If(isVisible, 
+        vdom.H("span", nil, "Visible content"),
     ),
 )
 
-// List rendering with vdom.ForEach()
-items := []string{"A", "B", "C"}
-vdom.E("ul",
-    vdom.ForEach(items, func(item string) any {
-        return vdom.E("li", item)
-    }),
+// Branching with vdom.IfElse()
+vdom.H("div", nil,
+    vdom.IfElse(isActive,
+        vdom.H("span", nil, "Active"),
+        vdom.H("span", nil, "Inactive"),
+    ),
 )
 
-// List rendering with indexes with vdom.ForEachIdx()
+// List rendering (adding "key" prop to li element)
 items := []string{"A", "B", "C"}
-vdom.E("ul",
+vdom.H("ul", nil,
     vdom.ForEachIdx(items, func(item string, idx int) any {
-        return vdom.E("li", vdom.P("key", idx), item)
+        return vdom.H("li", map[string]any{
+            "key": idx,
+            "className": "list-item",
+        }, item)
     }),
 )
 ```
 
-- Use vdom.Fragment(...any) to combine elements together into a group.  Useful with the conditional functions.
-- func If(cond bool, part any) any
-- func IfElse(cond bool, part any, elsePart any) any
-- func ForEach[T any](items []T, fn func(T) any) []any
-- func ForEachIdx[T any](items []T, fn func(T, int) any) []any
+Helper functions:
+- `vdom.Fragment(...any)` - Combines elements into a group without adding a DOM node. Useful with conditional functions.
+- `vdom.If(cond bool, part any) any` - Returns part if condition is true, nil otherwise
+- `vdom.IfElse(cond bool, truePart any, falsePart any) any` - Returns truePart if condition is true, falsePart otherwise
+- `vdom.ForEach[T any](items []T, fn func(T) any) []any` - Maps over items without index
+- `vdom.ForEachIdx[T any](items []T, fn func(T, int) any) []any` - Maps over items with index
+- `vdom.Filter[T any](items []T, fn func(T) bool) []T` - Filters items based on condition
+- `vdom.FilterIdx[T any](items []T, fn func(T, int) bool) []T` - Filters items with index access
+
+The same If/IfElse functions are used for both conditional rendering and conditional classes, always following the pattern of condition first, then value(s).
 
 ## Style Handling
 
-Use PStyle to set individual style properties:
+Styles are defined using a map[string]any in the props:
 
 ```go
-vdom.E("div",
-    vdom.PStyle("marginRight", 10),     // Numbers for px values
-    vdom.PStyle("backgroundColor", "#fff"),
-    vdom.PStyle("display", "flex"),
-    vdom.PStyle("fontSize", 16),
-    vdom.PStyle("borderRadius", 4),
-)
+vdom.H("div", map[string]any{
+    "style": map[string]any{
+        "marginRight": 10,         // Numbers for px values
+        "backgroundColor": "#fff", // Colors as strings
+        "display": "flex",         // CSS values as strings
+        "fontSize": 16,            // More numbers
+        "borderRadius": 4,         // Numbers to px
+    },
+})
+
+// Multiple style properties can be combined with dynamic values
+vdom.H("div", map[string]any{
+    "style": map[string]any{
+        "marginTop": spacing,      // Variables work too
+        "color": vdom.IfElse(isActive, "blue", "gray"),
+        "display": "flex",
+        "opacity": vdom.If(isVisible, 1.0),  // Conditional styles
+    },
+})
 ```
 
 Properties use camelCase (must match React) and values can be:
-- Numbers (automatically handled for px values)
+- Numbers (automatically converted to pixel values)
 - Colors as strings
 - Other CSS values as strings
+- Conditional values using If/IfElse
+
+The style map in props mirrors React's style object pattern, making it familiar to React developers while maintaining type safety in Go.
 
 ## External CSS Files
 
@@ -194,47 +229,90 @@ var AppClient *waveapp.Client = waveapp.MakeClient(waveapp.AppOpts{
 Create typed, reusable components using the client:
 
 ```go
+// Define prop types with json tags
 type TodoItemProps struct {
     Todo     Todo    `json:"todo"`
     OnToggle func()  `json:"onToggle"`
+    IsActive bool    `json:"isActive"`
 }
 
+// Create component with typed props
 var TodoItem = waveapp.DefineComponent[TodoItemProps](AppClient, "TodoItem",
     func(ctx context.Context, props TodoItemProps) any {
-        return vdom.E("div",
-            vdom.P("className", "todo-item"),
-            vdom.P("onClick", props.OnToggle),
-            props.Todo.Text,
-        )
+        return vdom.H("div", map[string]any{
+            "className": vdom.Classes(
+                "todo-item",
+                vdom.If(props.IsActive, "active"),
+            ),
+            "onClick": props.OnToggle,
+            "style": map[string]any{
+                "cursor": "pointer",
+                "opacity": vdom.If(props.IsActive, 1.0, 0.7),
+            },
+        }, props.Todo.Text)
     },
 )
 
-// Usage:
+// Usage in parent component:
+vdom.H("div", map[string]any{
+    "className": "todo-list",
+},
+    TodoItem(TodoItemProps{
+        Todo: todo,
+        OnToggle: handleToggle,
+        IsActive: isCurrentItem,
+    }),
+)
+
+// Usage with key (when in lists)
 TodoItem(TodoItemProps{
     Todo: todo,
     OnToggle: handleToggle,
-})
+}).WithKey(fmt.Sprint(idx))
 ```
+
+Components in WaveApp:
+- Use Go structs with json tags for props
+- Take a context and props as arguments
+- Return elements created with vdom.H()
+- Can use all hooks (useState, useRef, etc)
+- Are registered with the client and given a name
+- Are called as functions with their props struct
+
+Special Handling for Component "key" prop:
+- Use the WithKey(key string) chaining func to set a key on a component
+- Keys must be added for components rendered in lists (just like in React)
+- Keys should be unique among siblings and stable across renders
+- Keys are handled at the framework level and should not be declared in component props
+
+This pattern matches React's functional components while maintaining Go's type safety and explicit props definition.
 
 ## Handler Functions
 
-For most event handling, passing a function directly works:
+For most event handling, passing a function directly in the props map works:
 
 ```go
-vdom.E("button",
-    vdom.P("onClick", func() { 
+vdom.H("button", map[string]any{
+    "onClick": func() { 
         fmt.Println("clicked!") 
-    }),
-)
+    },
+})
+
+// With event data
+vdom.H("input", map[string]any{
+    "onChange": func(e vdom.VDomEvent) {
+        fmt.Println("new value:", e.TargetValue)
+    },
+})
 ```
 
-If you need to call stopPropagation, preventDefault, For keyboard events that need special handling, use VDomFunc:
+For keyboard events that need special handling, preventDefault, or stopPropagation, use VDomFunc:
 
 ```go
 // Handle specific keys with onKeyDown
 keyHandler := &vdom.VDomFunc{
-    Type: vdom.ObjectType_Func,
-    Fn: func(event vdom.VDomEvent) {
+    Type:            vdom.ObjectType_Func,
+    Fn:              func(event vdom.VDomEvent) {
         // handle key press
     },
     StopPropagation: true,    // Stop event bubbling
@@ -250,9 +328,18 @@ keyHandler := &vdom.VDomFunc{
     },
 }
 
-vdom.E("input",
-    vdom.P("onKeyDown", keyHandler),
-)
+vdom.H("input", map[string]any{
+    "className": "special-input",
+    "onKeyDown": keyHandler,
+})
+
+// Common pattern for form handling
+vdom.H("form", map[string]any{
+    "onSubmit": &vdom.VDomFunc{
+        Fn:             handleSubmit,
+        PreventDefault: true,  // Prevent form submission
+    },
+})
 ```
 
 The Keys field on VDomFunc:
@@ -263,6 +350,7 @@ The Keys field on VDomFunc:
   - Cmd: maps to Meta on Mac, Alt on Windows/Linux
   - Option: maps to Alt on Mac, Meta on Windows/Linux
 
+Event handlers follow React patterns while providing additional type safety and explicit control over event behavior through VDomFunc.
 
 ## State Management with Hooks
 
@@ -300,20 +388,20 @@ func MyComponent(ctx context.Context, props MyProps) any {
         }
     }, []any{count})
 
-    return vdom.E("div",
+    return vdom.H("div", nil,
         // Use DOM ref to get element properties
-        vdom.E("input",
-            vdom.P("ref", inputRef),
-            vdom.P("type", "text"),
-        ),
-        vdom.E("div", nil, 
+        vdom.H("input", map[string]any{
+            "ref": inputRef,
+            "type": "text",
+        }),
+        vdom.H("div", nil, 
             fmt.Sprintf("State: %d, Renders: %d", count, counter.Current),
         ),
     )
 }
 ```
 
-## State Management with Hooks
+## Available Hooks
 
 The system provides four main types of hooks:
 
@@ -363,10 +451,10 @@ The system provides four main types of hooks:
      - Direct DOM manipulation when needed
    ```go
    inputRef := vdom.UseVDomRef(ctx)
-   vdom.E("input",
-       vdom.P("ref", inputRef),
-       vdom.P("type", "text"),
-   )
+   vdom.H("input", map[string]any{
+       "ref": inputRef,
+       "type": "text",
+   })
    ```
 
 Best Practices:
@@ -448,7 +536,7 @@ var TodoApp = waveapp.DefineComponent[struct{}](AppClient, "TodoApp",
             }
         }, []any{})
 
-        return vdom.E("div",
+        return vdom.H("div", nil,
             vdom.ForEach(globalTodos, func(todo Todo) any {
                 return TodoItem(TodoItemProps{Todo: todo})
             }),
@@ -481,11 +569,13 @@ AppClient.RegisterFilePrefixHandler("/img/", func(path string) (*waveapp.FileHan
 })
 
 // Use in components with vdom:// prefix
-vdom.E("img", 
-    vdom.P("src", "vdom:///logo.png"),  // Note the vdom:// prefix
-    vdom.P("alt", "Logo"),
-    vdom.PStyle("background", "url(vdom:///logo.png)"), // vdom urls can be used in CSS as well
-)
+vdom.H("img", map[string]any{
+    "src": "vdom:///logo.png",  // Note the vdom:// prefix
+    "alt": "Logo",
+    "style": map[string]any{
+        "background": "url(vdom:///logo.png)", // vdom urls can be used in CSS as well
+    },
+})
 ```
 
 Files can come from:
@@ -541,12 +631,13 @@ var AppClient = waveapp.MakeClient(waveapp.AppOpts{
 var App = waveapp.DefineComponent(AppClient, "App",
     func(ctx context.Context, _ any) any {
         count, setCount := vdom.UseState(ctx, 0)
-        return vdom.E("div", nil,
+        return vdom.H("div", nil,
             // Access CLI flags/args directly
-            vdom.E("div", nil, "Path: ", myPath),
-            vdom.E("div", nil, "Verbose: ", *verbose),
-            vdom.E("button",
-                vdom.P("onClick", func() { setCount(count + 1) }),
+            vdom.H("div", nil, "Path: ", myPath),
+            vdom.H("div", nil, "Verbose: ", *verbose),
+            vdom.H("button", map[string]any{
+                "onClick": func() { setCount(count + 1) },
+            },
                 "Count: ", count,
             ),
         )
@@ -596,17 +687,16 @@ type AppOpts struct {
 ## Important Technical Details
 - Props must be defined as Go structs with json tags
 - Components take their props type directly: `func MyComponent(ctx context.Context, props MyProps) any`
-- Use vdom.Props() when passing structured props to vdom.E()
 - Always use waveapp.DefineComponent with the client instance
-- Use PStyle for cleaner style property setting
 - Call SendAsyncInitiation() after async state updates
-- Provide keys when using ForEach() with lists
+- Provide keys when using ForEachIdx() with lists
+- Use Classes() with If() for combining static and conditional class names
 - Consider cleanup functions in UseEffect() for async operations
 - <script> tags are not supported
 - Applications consist of exactly two files:
   - main.go: Contains all Go code and component definitions
   - style.css: Contains all styling (embedded into the app)
 - This is a pure Go system - do not attempt to write React components or JavaScript code
-- All UI rendering, including complex visualizations, should be done through Go using vdom.E()
+- All UI rendering, including complex visualizations, should be done through Go using vdom.H()
 
 The attached todo app demonstrates all these patterns in a complete application.
