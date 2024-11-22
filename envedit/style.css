@@ -1,0 +1,203 @@
+.env-editor {
+    padding: 1rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.env-header {
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.env-header h1 {
+    margin: 0;
+    margin-right: auto;
+}
+
+.env-path {
+    color: #888;
+    font-family: monospace;
+}
+
+.env-error {
+    background-color: #441111;
+    color: #ff6666;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+}
+
+.env-list {
+    margin-bottom: 1rem;
+}
+
+.env-item {
+    display: grid;
+    grid-template-columns: 200px 1fr auto;
+    gap: 1rem;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    min-height: 2rem;
+    align-items: center;
+    transition: background-color 0.3s ease;
+}
+
+.env-item.highlight {
+    background-color: rgba(102, 255, 102, 0.15);
+}
+
+.env-item-editing {
+    align-items: start;
+}
+
+.env-item-key {
+    font-family: monospace;
+    font-weight: bold;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.env-item-value {
+    font-family: monospace;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.env-item-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.env-item button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    background: none;
+    border: 1px solid #666;
+    border-radius: 3px;
+    color: #ccc;
+    cursor: pointer;
+}
+
+.env-item button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.env-item-delete:hover {
+    color: #ff6666;
+    border-color: #ff6666;
+}
+
+.env-edit-key {
+    width: 100%;
+    padding: 0.5rem;
+    font-family: monospace;
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 1px solid #666;
+    border-radius: 3px;
+    color: #fff;
+}
+
+.env-key-static {
+    padding: 0.5rem;
+    font-family: monospace;
+    font-weight: bold;
+}
+
+.env-edit-value {
+    width: 100%;
+    padding: 0.5rem;
+    font-family: monospace;
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 1px solid #666;
+    border-radius: 3px;
+    color: #fff;
+    resize: vertical;
+    min-height: 4.5rem;
+}
+
+.env-edit-error {
+    color: #ff6666;
+    grid-column: 1 / -1;
+    margin-top: 0.5rem;
+}
+
+/* Updated button styles */
+.env-edit-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    min-height: 32px;
+}
+
+.env-edit-save,
+.env-edit-cancel {
+    height: 32px;
+    padding: 0 1rem;
+    background: none;
+    border: 1px solid #666;
+    border-radius: 3px;
+    color: #ccc;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 14px;
+    min-width: 80px;
+}
+
+.env-edit-save {
+    border-color: #66ff66;
+    color: #66ff66;
+}
+
+.env-edit-save:hover {
+    background-color: rgba(100, 255, 100, 0.1);
+}
+
+.env-edit-cancel:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.env-edit-save i {
+    font-size: 12px;
+}
+
+.env-add {
+    padding: 0.5rem 1rem;
+    background: none;
+    border: 1px solid #66ff66;
+    border-radius: 3px;
+    color: #66ff66;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.env-add:hover {
+    background-color: rgba(100, 255, 100, 0.1);
+}
+
+.env-add i {
+    font-size: 0.875em;
+}
+
+.env-add-active {
+    border-color: #666;
+    color: #ccc;
+}
+
+.env-add-active:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
