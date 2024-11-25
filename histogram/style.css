@@ -1,0 +1,139 @@
+.app {
+    padding: 20px;
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* Controls */
+.controls {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.control-group input {
+    padding: 4px 8px;
+    width: 80px;
+    background: transparent;
+    border: 1px solid #666;
+    border-radius: 4px;
+    color: white;
+}
+
+.control-group input::placeholder {
+    color: #666;
+}
+
+.clear-btn {
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #666;
+    background: transparent;
+    color: #666;
+    cursor: pointer;
+}
+
+.clear-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Histogram */
+.histogram-empty {
+    color: white;
+    font-style: italic;
+    padding: 20px 0;
+}
+
+.histogram-stats {
+    margin-bottom: 16px;
+    color: white;
+}
+
+.histogram-scroll-container {
+    overflow-x: auto;
+    margin-bottom: 40px;
+    background: rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.histogram-content {
+    display: flex;
+    align-items: flex-end;
+    height: 240px;  /* Increased to accommodate labels */
+    gap: 2px;
+}
+
+.histogram-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 30px;
+    position: relative;
+}
+
+.bar {
+    width: 100%;
+    background: #2563eb;
+    transition: background-color 0.2s ease;
+    border-radius: 2px 2px 0 0;
+    margin-bottom: 40px;  /* Space for label */
+}
+
+.bar.empty {
+    background: rgba(37, 99, 235, 0.2);
+}
+
+.histogram-column:hover .bar {
+    background: #22c55e;
+}
+
+.histogram-column:hover .bar.empty {
+    background: rgba(34, 197, 94, 0.2);
+}
+
+.count-label {
+    position: absolute;
+    top: -24px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: all 0.2s ease;
+    pointer-events: none;
+}
+
+.histogram-column:hover .count-label {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.x-label {
+    color: white;
+    font-size: 11px;
+    transform: rotate(-45deg);
+    transform-origin: left top;
+    white-space: nowrap;
+    position: absolute;
+    bottom: 10px;
+    left: -8px;  /* Align to left edge of column */
+}
+
+.histogram-final-label {
+    min-width: 30px;
+    position: relative;
+}
+
+.histogram-final-label .x-label {
+    left: -8px;  /* Align to left edge of final label div */
+}
