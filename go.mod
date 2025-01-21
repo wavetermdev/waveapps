@@ -1,15 +1,14 @@
-module vdomtest
+module waveapps
 
-go 1.22.4
+go 1.23.4
 
 require (
 	github.com/shirou/gopsutil/v3 v3.24.5
-	github.com/wavetermdev/waveterm v0.9.1
+	github.com/wavetermdev/waveterm v0.10.4
 )
 
 require (
 	github.com/alexflint/go-filemutex v1.3.0 // indirect
-	github.com/fsnotify/fsnotify v1.8.0 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
 	github.com/golang-migrate/migrate/v4 v4.18.1 // indirect
@@ -29,9 +28,7 @@ require (
 	github.com/wavetermdev/htmltoken v0.2.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
-	golang.org/x/net v0.29.0 // indirect
-	golang.org/x/sys v0.27.0 // indirect
-	golang.org/x/term v0.26.0 // indirect
+	golang.org/x/net v0.33.0 // indirect
+	golang.org/x/sys v0.29.0 // indirect
+	golang.org/x/term v0.28.0 // indirect
 )
-
-replace github.com/wavetermdev/waveterm => ../waveterm
